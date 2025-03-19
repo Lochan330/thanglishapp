@@ -1,0 +1,6 @@
+streamlit
+groq
+google-search-results
+deep_translator
+langdetect
+openai>=0.27.0
