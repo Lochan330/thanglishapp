@@ -122,7 +122,8 @@ if st.session_state.chat_history:
     st.write("### Chat History")
     for chat in st.session_state.chat_history:
         st.write(f"*You:* {chat['question']}")
-        st.write(f"*Assistant:* {chat.response}")
+        st.write(f"*Assistant:* {chat['response']}")
+
         if chat['web_results']:
             st.write("*Web Sources:*")
             for idx, result in enumerate(chat['web_results'], 1):

@@ -1,0 +1,66 @@
+Here’s a step-by-step guide to push your project to GitHub:
+
+✅ 1. Initialize Git in Your Project Folder
+Open your project directory in the terminal:
+
+shell
+Copy
+Edit
+cd path/to/your/project
+Initialize the repository:
+
+shell
+Copy
+Edit
+git init
+✅ 2. Add a Remote Repository
+Create a new repository on GitHub.
+Add the remote link:
+shell
+Copy
+Edit
+git remote add origin https://github.com/your-username/your-repo-name.git
+Example:
+
+shell
+Copy
+Edit
+git remote add origin https://github.com/Lochan330/thanglishapp.git
+✅ 3. Add and Commit Files
+Stage all files:
+
+shell
+Copy
+Edit
+git add .
+Commit with a message:
+
+shell
+Copy
+Edit
+git commit -m "Initial commit"
+✅ 4. Push to GitHub
+If your branch is main:
+
+shell
+Copy
+Edit
+git push -u origin main
+If your branch is master:
+
+shell
+Copy
+Edit
+git push -u origin master
+✅ 5. Verify on GitHub
+Go to your GitHub repository.
+You should see all your files listed! ✅
+👉 After this, for future updates, you can simply use:
+
+shell
+Copy
+Edit
+git add .
+git commit -m "update"
+git push
+Let me know if you face any issues! 😎
