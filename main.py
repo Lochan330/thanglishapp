@@ -7,7 +7,7 @@ from deep_translator import GoogleTranslator
 from langdetect import detect
 import re
 
-OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+OPENAI_API_KEY = st.secrets["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"]
 client = OpenAI(api_key=OPENAI_API_KEY) 
 
 # Streamlit app title and description
@@ -16,7 +16,7 @@ st.write("Ask me anything in English or Thanglish, and I'll generate a response 
 
 # Get the API keys from Streamlit secrets
 
-SERPAPI_API_KEY = st.secrets["SERPAPI_API_KEY"]
+SERPAPI_API_KEY = st.secrets["7472beb32635175705d99e16e6accade78dff832437fde23a819a0cd36aadb5b"]
 
 # Set your OpenAI API key
 
