@@ -1,14 +1,29 @@
 import streamlit as st
 import os
-from openai import OpenAI
-# Import OpenAI library
 from serpapi import GoogleSearch
 from deep_translator import GoogleTranslator
 from langdetect import detect
 import re
 
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
-client = OpenAI(api_key=OPENAI_API_KEY) 
+
+def call_groq_gpt4o(prompt):
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": "gpt-4o",  # Or change to "llama3-70b-8192" / "mixtral-8x7b-32768"
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.7,
+        "max_tokens": 500
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+    response.raise_for_status()
+    return response.json()["choices"][0]["message"]["content"]
+
 
 # Streamlit app title and description
 st.title("Enhanced Mini Perplexity - Advanced Thanglish Support!")
