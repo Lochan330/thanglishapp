@@ -98,13 +98,7 @@ def call_gpt4o_api(prompt, include_web_search=False):
                 search_results = []
 
         # Call the OpenAI GPT-4o API using the correct endpoint and model name.
-        response = client.chat.completions.create(model="gpt-4o",  # Updated to use GPT-4o per OpenAI docs
-        messages=[{"role": "user", "content": enhanced_prompt}],
-        max_tokens=500,
-        temperature=0.7,
-        top_p=0.9)
-        # Use dictionary-style indexing per the new API format.
-        content = response.choices[0].message.content
+        content = call_groq_gpt4o(enhanced_prompt)
         return content, search_results
     except Exception as e:
         return f"Error: {str(e)}", []
