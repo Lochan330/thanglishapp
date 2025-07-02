@@ -1,53 +1,32 @@
-import requests 
 import streamlit as st
-import os
+import requests
 from serpapi import GoogleSearch
 from deep_translator import GoogleTranslator
 from langdetect import detect
 import re
 
+# Load GROQ and SERPAPI keys from Streamlit secrets
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+SERPAPI_API_KEY = st.secrets["SERPAPI_API_KEY"]
 
-def call_groq_gpt4o(prompt):
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "model": "gpt-4o",  # Or change to "llama3-70b-8192" / "mixtral-8x7b-32768"
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.7,
-        "max_tokens": 500
-    }
+# Translator
+translator = GoogleTranslator(source='auto', target='en')
 
-    response = requests.post(url, headers=headers, json=payload)
-    response.raise_for_status()
-    return response.json()["choices"][0]["message"]["content"]
-
-
-# Streamlit app title and description
+# Streamlit UI
 st.title("Enhanced Mini Perplexity - Advanced Thanglish Support!")
 st.write("Ask me anything in English or Thanglish, and I'll generate a response using advanced NLP techniques and up-to-date web information!")
 
-# Get the API keys from Streamlit secrets
-
-SERPAPI_API_KEY = st.secrets["SERPAPI_API_KEY"]
-
-# Set your OpenAI API key
-
-translator = GoogleTranslator(source='auto', target='en')
-
-# Initialize session state to keep track of chat history
+# Initialize session state
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 
+# Detect Thanglish
 def is_thanglish(text):
-    """Detect if the text is in Thanglish (Tamil+English mix)."""
-    tamil_chars = re.findall(r'[\u0B80-\u0BFF]', text)  # Tamil Unicode range
+    tamil_chars = re.findall(r'[\u0B80-\u0BFF]', text)
     english_chars = re.findall(r'[a-zA-Z]', text)
     return bool(tamil_chars) and bool(english_chars)
 
+# Translate to English if needed
 def translate_if_needed(text):
     try:
         detected_lang = detect(text)
@@ -58,6 +37,7 @@ def translate_if_needed(text):
         st.error(f"Translation error: {str(e)}")
         return text
 
+# Web search via SerpAPI
 def search_web(query):
     params = {
         "engine": "google",
@@ -69,6 +49,7 @@ def search_web(query):
     results = search.get_dict()
     return results.get("organic_results", [])[:5]
 
+# Format search results
 def format_search_results(results):
     formatted_results = [
         f"Title: {result['title']}\nSnippet: {result['snippet']}\nLink: {result['link']}\n"
@@ -76,9 +57,26 @@ def format_search_results(results):
     ]
     return "\n".join(formatted_results)
 
+# Call GROQ API
+def call_groq_gpt4o(prompt):
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": "gpt-4o",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.7,
+        "max_tokens": 500
+    }
+    response = requests.post(url, headers=headers, json=payload)
+    response.raise_for_status()
+    return response.json()["choices"][0]["message"]["content"]
+
+# Main function to call GROQ with logic
 def call_gpt4o_api(prompt, include_web_search=False):
     try:
-        # Determine if the prompt is Thanglish and adjust accordingly
         if is_thanglish(prompt):
             enhanced_prompt = (
                 f"Respond in Thanglish naturally with conversational fluency. "
@@ -95,16 +93,16 @@ def call_gpt4o_api(prompt, include_web_search=False):
                     f"'{translated_prompt}'\n\nWeb search results:\n{formatted_results}\n\nYour response:"
                 )
             else:
-                enhanced_prompt = translate_if_needed(prompt)
+                enhanced_prompt = translated_prompt
                 search_results = []
 
-        # Call the OpenAI GPT-4o API using the correct endpoint and model name.
         content = call_groq_gpt4o(enhanced_prompt)
-        return content, search_results
+        return content, search_results if include_web_search else []
+
     except Exception as e:
         return f"Error: {str(e)}", []
 
-# User input and UI components
+# Streamlit UI logic
 user_input = st.text_input("Enter your question (in English or Thanglish):")
 use_web_search = st.checkbox("Enable web search for up-to-date information")
 
@@ -132,7 +130,7 @@ if st.session_state.chat_history:
     st.write("### Chat History")
     for chat in st.session_state.chat_history:
         st.write(f"*You:* {chat['question']}")
-        st.write(f"*Assistant:* {chat.response}")
+        st.write(f"*Assistant:* {chat['response']}")
         if chat['web_results']:
             st.write("*Web Sources:*")
             for idx, result in enumerate(chat['web_results'], 1):
