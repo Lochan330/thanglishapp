@@ -7,7 +7,7 @@ from deep_translator import GoogleTranslator
 from langdetect import detect
 import re
 
-OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 client = OpenAI(api_key=OPENAI_API_KEY) 
 
 # Streamlit app title and description
